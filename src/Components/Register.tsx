@@ -1,6 +1,11 @@
-"use client"
+"use client";
 import { useState } from "react";
+import axios from "axios";
+import { API } from "@/Services/Api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css'
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -9,6 +14,7 @@ const Register = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
@@ -28,28 +34,26 @@ const Register = () => {
       setPasswordError("");
     }
     setLoading(true);
-    // if (!error && emailError === "" && passwordError === "") {
-    //   try {
-    //     const response = await axios.post(`${API}/admin/register`, {
-    //       name,
-    //       email,
-    //       password,
-    //     });
-    //     if (response.status === 201) {
-    //       navigate("/");
-    //     }
-    //   } catch (error: any) {
-    //     if (error.response.data.error === "Email already exist") {
-    //       toast("Admin already exists");
-    //     } else {
-    //       toast("Error submitting data:");
-    //     }
-    //   }
-    //   finally{
-    //     setLoading(false);
-      
-    //   }
-    // }
+    if (!error && emailError === "" && passwordError === "") {
+      try {
+        const response = await axios.post(`${API}/user/register`, {
+          name,
+          email,
+          password,
+        });
+        if (response.status === 201) {
+          router.push("/login");
+        }
+      } catch (error: any) {
+        if (error.response.data.message === "Email already exists") {
+          toast("User already exists");
+        } else {
+          toast("Error submitting data:");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
   };
   const handleName = (e: any) => {
     setName(e.target.value);
@@ -151,7 +155,7 @@ const Register = () => {
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-               Register
+                Register
               </button>
             </div>
           </form>
@@ -159,13 +163,14 @@ const Register = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an account?
             <Link
-              href="/"
+              href="/login"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               Login
             </Link>
           </p>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

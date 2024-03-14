@@ -1,17 +1,40 @@
 "use client"
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Link from "next/link";
+import {API} from "@/Services/Api"
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+
+  const router = useRouter();
   const handleLogin = async(e: any) => {
     e.preventDefault();
     if (!email || !password) {
       setError(true);
       return;
-    } 
+    } else {
+      setError(false);
+      await axios
+        .post(`${API}/user/login`, { email, password })
+        .then((res) => {
+          localStorage.setItem("token", res.data.token);
+          router.push("/");
+        })
+        .catch((err) => {
+          toast(err.response.data.message);
+        });
+    }
   };
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      router.push("/");
+    }
+  }, []);
   return (
     <>
       <div className="flex items-center h-[100vh] flex-col justify-center bg-[#c9cbc9] ">
@@ -83,6 +106,7 @@ const Login = () => {
             </Link>
           </p>
         </div>
+        <ToastContainer />
       </div>
     </>
   );
