@@ -76,8 +76,8 @@ const CreateNote = () => {
       .then((res) => {
         setNotes(res.data);
       })
-      .catch((err) => {
-       toast(err.message);
+      .catch((err:any) => {
+       console.log(err.message);
       });
   };
   useEffect(() => {
